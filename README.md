@@ -12,6 +12,7 @@ Monitoring procedure example
 - https://central.sonatype.dev/artifact/org.neo4j/neo4j/4.4.16/pom
 - https://central.sonatype.dev/artifact/org.neo4j/parent/4.4.16/pom
 - https://central.sonatype.dev/artifact/org.neo4j.driver/neo4j-java-driver/4.4.11/versions
+- https://mvnrepository.com/artifact/io.prometheus/simpleclient_dropwizard
 - http://localhost:2004
 
 
@@ -40,7 +41,7 @@ mvn clean package
 - Restart Neo4j
 - Check http://localhost:2004 - there shouldn't be a custom metric
 - Run cypher: `call example.monitoring`
-- Check http://localhost:2004 - there should be custom metrics (probably at the very top), starting with `com_graphaware_neo4j_monitoring_MonitorProcedure`
+- Check http://localhost:2004 - there should be custom metrics (probably at the very top), starting with `my_`
 
 # Original instructions
 
