@@ -13,7 +13,19 @@
     <description>An example project for monitoring a Neo4j Procedure with Prometheus</description>
 
     <properties>
-        <neo4j.version>3.5.5</neo4j.version>
+        <java.version>11</java.version>
+        <maven.compiler.release>${java.version}</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <neo4j.version>4.4.16</neo4j.version>
+        <!-- <assertj.version>3.18.1</assertj.version> -->
+        <neo4j-java-driver.version>4.4.11</neo4j-java-driver.version>
+        <!-- <junit-jupiter.version>5.8.2</junit-jupiter.version> -->
+        <maven-shade-plugin.version>3.2.4</maven-shade-plugin.version>
+        <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
+        <assertj.version>3.22.0</assertj.version>
+        <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
+        <metrics.version>4.2.3</metrics.version>
     </properties>
 
     <dependencies>
@@ -28,7 +40,7 @@
         <dependency>
             <groupId>io.dropwizard.metrics</groupId>
             <artifactId>metrics-core</artifactId>
-            <version>4.0.2</version>
+            <version>${metrics.version}</version>
             <scope>provided</scope>
         </dependency>
 
@@ -63,7 +75,7 @@
         <dependency>
             <groupId>org.neo4j.driver</groupId>
             <artifactId>neo4j-java-driver</artifactId>
-            <version>1.7.2</version>
+            <version>${neo4j-java-driver.version}</version>
         </dependency>
 
         <dependency>
@@ -76,7 +88,7 @@
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
-            <version>3.8.0</version>
+            <version>${assertj.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -84,12 +96,11 @@
     <build>
 
         <finalName>${project.artifactId}</finalName>
-        <plugins>
+<!--         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.1</version>
                 <configuration>
-                    <!-- Neo4j Procedures require Java 8 -->
                     <source>1.8</source>
                     <target>1.8</target>
                 </configuration>
@@ -106,6 +117,57 @@
                     </execution>
                 </executions>
             </plugin>
+        </plugins> -->
+
+        <plugins>
+          <plugin>
+            <artifactId>maven-enforcer-plugin</artifactId>
+            <version>3.0.0</version>
+            <executions>
+              <execution>
+                <id>enforce</id>
+                <goals>
+                  <goal>enforce</goal>
+                </goals>
+                <phase>validate</phase>
+                <configuration>
+                  <rules>
+                    <requireJavaVersion>
+                      <version>${java.version}</version>
+                    </requireJavaVersion>
+                  </rules>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <version>${maven-compiler-plugin.version}</version>
+          </plugin>
+          <plugin>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <version>${maven-surefire-plugin.version}</version>
+          </plugin>
+          <plugin>
+            <!-- This generates a jar-file with our procedure code,
+                 plus any dependencies marked as `compile` scope.
+                 This should then be deployed in the `plugins` directory
+                 of each Neo4j instance in your deployment.
+                 After a restart, the procedure is available for calling. -->
+            <artifactId>maven-shade-plugin</artifactId>
+            <version>${maven-shade-plugin.version}</version>
+            <configuration>
+              <createDependencyReducedPom>false</createDependencyReducedPom>
+            </configuration>
+            <executions>
+              <execution>
+                <phase>package</phase>
+                <goals>
+                  <goal>shade</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
         </plugins>
     </build>
 

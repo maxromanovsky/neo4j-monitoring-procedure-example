@@ -15,37 +15,37 @@ import static com.codahale.metrics.MetricRegistry.name;
 
 public class MonitorProcedure {
 
-    //Container for our application’s metrics
+    // Container for our application’s metrics
     private static final MetricRegistry METRIC_REGISTRY = new MetricRegistry();
 
-    //Custom Timer metric registration
+    // Custom Timer metric registration
     private static final Timer myTimer = METRIC_REGISTRY.timer(name(MonitorProcedure.class, "my_timer"));
 
-    //Custom Counter metric registration
+    // Custom Counter metric registration
     private static final Counter myCounter = METRIC_REGISTRY.counter(name(MonitorProcedure.class, "my_counter"));
 
     @Context
     public GraphDatabaseService db;
 
     static {
-        //We use default registry of the Prometheus client's CollectorRegistry to register our MetricRegistry
-        //This way our metrics will be published on the Neo4j's Prometheus URL
+        // We use default registry of the Prometheus client's CollectorRegistry to
+        // register our MetricRegistry
+        // This way our metrics will be published on the Neo4j's Prometheus URL
         CollectorRegistry.defaultRegistry.register(new DropwizardExports(METRIC_REGISTRY));
     }
 
-    @Procedure(value = "example.monitoring", mode=Mode.READ)
+    @Procedure(value = "example.monitoring", mode = Mode.READ)
     @Description("Example procedure to define some custom metrics and publish to Prometheus")
-    public void monitoring()
-    {
+    public void monitoring() {
         Timer.Context timerContext = myTimer.time();
 
-        //Do some business logic here
-        db.getAllLabels();
+        // Do some business logic here
+        // db.databaseName();
 
-        //Use our custom counter
+        // Use our custom counter
         myCounter.inc();
 
-        //Close Timer context
+        // Close Timer context
         timerContext.close();
     }
 
